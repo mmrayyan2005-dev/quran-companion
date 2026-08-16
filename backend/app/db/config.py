@@ -19,5 +19,16 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
     jwt_algorithm: str = "HS256"
 
+    # Comma-separated list of allowed frontend origins for CORS.
+    # Defaults to local dev; production deployments override this via env
+    # var to include the real deployed frontend URL(s) — this is why it's
+    # not hardcoded in main.py, which would've broken the moment the
+    # frontend moved off localhost.
+    cors_allowed_origins: str = "http://localhost:5173"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
+
 
 settings = Settings()
