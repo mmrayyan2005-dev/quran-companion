@@ -1,0 +1,266 @@
+/*
+  Design direction: illuminated manuscript, read at night.
+  Deep teal-black ground (like aged manuscript ink), gold-leaf accent
+  (the way illuminated Quran manuscripts use gold for emphasis and
+  section markers), warm parchment text. Arabic verse text gets its
+  own serif (Amiri) distinct from the English UI chrome (Inter) and
+  English headings (Spectral) — three typefaces each doing one job,
+  not one family stretched across every role.
+
+  Signature element: a thin gold rule with a small diamond/rosette
+  mark at center, used as the section divider throughout — echoes the
+  small illuminated verse-separator marks (ayah markers) found in
+  Quranic manuscripts, without literally reproducing one.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Spectral:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Color */
+  --ink: #0e2429;         /* primary background — deep teal-black */
+  --ink-raised: #15343a;  /* card / raised surface */
+  --ink-raised-2: #1c414a;/* hover / active surface */
+  --gold: #c9a24b;        /* illuminated manuscript gold leaf */
+  --gold-soft: #e3c988;   /* lighter gold for text-on-dark accents */
+  --parchment: #f3ecd9;   /* primary text — warm off-white */
+  --parchment-muted: #a9beb9; /* secondary text, muted teal-grey */
+  --border-hairline: #2a4a51;
+  --error: #d97757;
+
+  /* Type */
+  --font-arabic: 'Amiri', serif;
+  --font-display: 'Spectral', Georgia, serif;
+  --font-ui: 'Inter', -apple-system, sans-serif;
+
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0 0 0.5em 0;
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 1em 0;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--gold-soft);
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+input {
+  font-family: var(--font-ui);
+  background: var(--ink-raised);
+  border: 1px solid var(--border-hairline);
+  color: var(--parchment);
+  border-radius: var(--radius);
+  padding: 0.75em 1em;
+  font-size: 1rem;
+}
+
+input::placeholder {
+  color: var(--parchment-muted);
+}
+
+/* Signature divider: thin gold rule with a center rosette mark */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: 1.5em 0;
+  color: var(--gold);
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-hairline), transparent);
+}
+.divider-mark {
+  font-size: 0.7em;
+  transform: rotate(45deg);
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+}
+
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 6rem 1.25rem; /* bottom padding clears the nav bar */
+}
+
+/* Bottom nav — thumb-reachable, fixed to viewport bottom */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  background: var(--ink-raised);
+  border-top: 1px solid var(--border-hairline);
+  padding: 0.5rem 0.25rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.7rem;
+  color: var(--parchment-muted);
+  background: none;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius);
+  transition: color 0.15s ease;
+}
+
+.bottom-nav__item--active {
+  color: var(--gold-soft);
+}
+
+.bottom-nav__icon {
+  font-size: 1.15rem;
+}
+
+.bottom-nav__item--button {
+  font-family: var(--font-ui);
+}
+
+/* Shared component styles */
+.card {
+  background: var(--ink-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.card:hover {
+  border-color: var(--gold);
+  cursor: pointer;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75em 1.5em;
+  font-weight: 600;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.btn:hover {
+  background: var(--gold-soft);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-hairline);
+  color: var(--parchment);
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold);
+  background: var(--ink-raised-2);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: var(--parchment-muted);
+}
+
+.error-text {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin: -0.5rem 0 1rem 0;
+}
+
+.muted {
+  color: var(--parchment-muted);
+  font-size: 0.9rem;
+}
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--parchment-muted);
+}
+
+.arabic-text {
+  font-family: var(--font-arabic);
+  font-size: 1.6rem;
+  line-height: 2.4;
+  direction: rtl;
+  text-align: right;
+  color: var(--parchment);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

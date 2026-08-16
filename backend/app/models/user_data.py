@@ -35,6 +35,7 @@ class Bookmark(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="bookmarks")
+    verse = relationship("Verse")
 
 
 class MemorizationProgress(Base):

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import verses, memorization
+from app.api import verses, memorization, auth, bookmarks
 
 app = FastAPI(
     title="Quran Study Companion API",
@@ -16,7 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(verses.router)
+app.include_router(bookmarks.router)
 app.include_router(memorization.router)
 
 

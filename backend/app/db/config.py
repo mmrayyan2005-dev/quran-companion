@@ -13,5 +13,11 @@ class Settings(BaseSettings):
     quran_api_base_url: str = "https://api.quran.com/api/v4"
     environment: str = "development"
 
+    # Auth settings. secret_key MUST be overridden via .env in any real
+    # deployment — this default is only safe for local dev.
+    secret_key: str = "dev-only-insecure-secret-change-me"
+    access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+    jwt_algorithm: str = "HS256"
+
 
 settings = Settings()

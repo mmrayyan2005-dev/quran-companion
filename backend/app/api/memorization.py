@@ -1,40 +1,83 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.user_data import MemorizationProgress
+from app.models.user_data import User, MemorizationProgress
+from app.models.verse import Verse
 from app.schemas.user_data import MemorizationProgressOut, ReviewSubmit
 from app.services.spaced_repetition import ReviewState, schedule_next_review
 
 router = APIRouter(prefix="/api/v1/memorization", tags=["memorization"])
 
-# NOTE: auth/current-user wiring comes with the auth milestone.
-# For now these endpoints take user_id explicitly so the scheduling
-# logic and API shape can be built and tested before auth exists.
+
+@router.post("/add/{verse_id}", response_model=MemorizationProgressOut, status_code=status.HTTP_201_CREATED)
+def add_to_memorization(
+    verse_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Adds a verse to the user's memorization queue, due for review
+    immediately. Distinct from submit_review below — that endpoint scores
+    an existing review, this one creates the starting entry so a verse
+    can show up in /due for the first time.
+    """
+    verse = db.get(Verse, verse_id)
+    if verse is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Verse not found")
+
+    existing = (
+        db.query(MemorizationProgress)
+        .filter_by(user_id=current_user.id, verse_id=verse_id)
+        .one_or_none()
+    )
+    if existing is not None:
+        return existing  # already in the queue — not an error, just a no-op
+
+    progress = MemorizationProgress(
+        user_id=current_user.id,
+        verse_id=verse_id,
+        ease_factor=2.5,
+        interval_days=1,
+        repetitions=0,
+        next_review_at=datetime.now(timezone.utc),  # due right away
+    )
+    db.add(progress)
+    db.commit()
+    db.refresh(progress)
+    return progress
 
 
-@router.get("/due/{user_id}", response_model=list[MemorizationProgressOut])
-def get_due_reviews(user_id: int, db: Session = Depends(get_db)):
+@router.get("/due", response_model=list[MemorizationProgressOut])
+def get_due_reviews(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     now = datetime.now(timezone.utc)
     return (
         db.query(MemorizationProgress)
-        .filter(MemorizationProgress.user_id == user_id, MemorizationProgress.next_review_at <= now)
+        .filter(MemorizationProgress.user_id == current_user.id, MemorizationProgress.next_review_at <= now)
         .all()
     )
 
 
-@router.post("/review/{user_id}", response_model=MemorizationProgressOut)
-def submit_review(user_id: int, payload: ReviewSubmit, db: Session = Depends(get_db)):
+@router.post("/review", response_model=MemorizationProgressOut)
+def submit_review(
+    payload: ReviewSubmit,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     progress = (
         db.query(MemorizationProgress)
-        .filter_by(user_id=user_id, verse_id=payload.verse_id)
+        .filter_by(user_id=current_user.id, verse_id=payload.verse_id)
         .one_or_none()
     )
     if progress is None:
         progress = MemorizationProgress(
-            user_id=user_id, verse_id=payload.verse_id, ease_factor=2.5, interval_days=1, repetitions=0
+            user_id=current_user.id, verse_id=payload.verse_id, ease_factor=2.5, interval_days=1, repetitions=0
         )
         db.add(progress)
         db.flush()
