@@ -3,8 +3,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.models.verse import Surah, Verse
-from app.schemas.verse import SurahOut, VerseOut, VerseSearchResult
+from app.models.verse import Surah, Verse, Tafsir
+from app.schemas.verse import SurahOut, VerseOut, VerseSearchResult, TafsirOut
 
 router = APIRouter(prefix="/api/v1", tags=["verses"])
 
@@ -22,6 +22,20 @@ def get_surah_verses(surah_id: int, db: Session = Depends(get_db)):
     if not verses:
         raise HTTPException(status_code=404, detail="Surah not found")
     return verses
+
+
+@router.get("/verses/{verse_id}/tafsir", response_model=list[TafsirOut])
+def get_verse_tafsir(verse_id: int, db: Session = Depends(get_db)):
+    """
+    Returns all available tafsir entries for a verse, from whichever
+    sources have been ingested so far (see scripts/ingest_tafsir_data.py).
+    Empty list is a valid response — it just means no tafsir source has
+    been ingested for this verse yet, not an error.
+    """
+    verse = db.get(Verse, verse_id)
+    if verse is None:
+        raise HTTPException(status_code=404, detail="Verse not found")
+    return db.query(Tafsir).filter(Tafsir.verse_id == verse_id).order_by(Tafsir.source_name).all()
 
 
 @router.get("/verses/search", response_model=list[VerseSearchResult])

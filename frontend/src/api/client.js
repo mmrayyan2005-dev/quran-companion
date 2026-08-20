@@ -61,6 +61,7 @@ export const api = {
   listSurahs: () => request('/api/v1/surahs'),
   getSurahVerses: (surahId) => request(`/api/v1/surahs/${surahId}/verses`),
   searchVerses: (q) => request(`/api/v1/verses/search?q=${encodeURIComponent(q)}`),
+  getVerseTafsir: (verseId) => request(`/api/v1/verses/${verseId}/tafsir`),
 
   // Bookmarks
   listBookmarks: () => request('/api/v1/bookmarks', { auth: true }),

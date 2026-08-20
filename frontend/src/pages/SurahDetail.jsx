@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import TafsirPanel from './TafsirPanel';
 
 export default function SurahDetail() {
   const { surahId } = useParams();
@@ -74,6 +75,7 @@ export default function SurahDetail() {
           </div>
           <p className="arabic-text">{verse.text_arabic}</p>
           <p>{verse.text_translation_en}</p>
+          <TafsirPanel verseId={verse.id} />
         </div>
       ))}
     </div>
