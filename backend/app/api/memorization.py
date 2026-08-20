@@ -1,16 +1,36 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.user_data import User, MemorizationProgress
 from app.models.verse import Verse
-from app.schemas.user_data import MemorizationProgressOut, ReviewSubmit
+from app.schemas.user_data import MemorizationProgressOut, ReviewSubmit, BookmarkVerseInfo
 from app.services.spaced_repetition import ReviewState, schedule_next_review
 
 router = APIRouter(prefix="/api/v1/memorization", tags=["memorization"])
+
+
+def _to_progress_out(progress: MemorizationProgress) -> MemorizationProgressOut:
+    v = progress.verse
+    return MemorizationProgressOut(
+        verse_id=progress.verse_id,
+        ease_factor=progress.ease_factor,
+        interval_days=progress.interval_days,
+        repetitions=progress.repetitions,
+        last_reviewed_at=progress.last_reviewed_at,
+        next_review_at=progress.next_review_at,
+        verse=BookmarkVerseInfo(
+            id=v.id,
+            surah_id=v.surah_id,
+            ayah_number=v.ayah_number,
+            text_arabic=v.text_arabic,
+            text_translation_en=v.text_translation_en,
+            surah_name_english=v.surah.name_english,
+        ),
+    )
 
 
 @router.post("/add/{verse_id}", response_model=MemorizationProgressOut, status_code=status.HTTP_201_CREATED)
@@ -35,7 +55,7 @@ def add_to_memorization(
         .one_or_none()
     )
     if existing is not None:
-        return existing  # already in the queue — not an error, just a no-op
+        return _to_progress_out(existing)  # already in the queue — not an error, just a no-op
 
     progress = MemorizationProgress(
         user_id=current_user.id,
@@ -48,7 +68,7 @@ def add_to_memorization(
     db.add(progress)
     db.commit()
     db.refresh(progress)
-    return progress
+    return _to_progress_out(progress)
 
 
 @router.get("/due", response_model=list[MemorizationProgressOut])
@@ -57,11 +77,13 @@ def get_due_reviews(
     db: Session = Depends(get_db),
 ):
     now = datetime.now(timezone.utc)
-    return (
+    rows = (
         db.query(MemorizationProgress)
+        .options(joinedload(MemorizationProgress.verse).joinedload(Verse.surah))
         .filter(MemorizationProgress.user_id == current_user.id, MemorizationProgress.next_review_at <= now)
         .all()
     )
+    return [_to_progress_out(r) for r in rows]
 
 
 @router.post("/review", response_model=MemorizationProgressOut)
@@ -97,4 +119,4 @@ def submit_review(
 
     db.commit()
     db.refresh(progress)
-    return progress
+    return _to_progress_out(progress)

@@ -47,3 +47,4 @@ class MemorizationProgressOut(BaseModel):
     repetitions: int
     last_reviewed_at: datetime | None
     next_review_at: datetime
+    verse: BookmarkVerseInfo

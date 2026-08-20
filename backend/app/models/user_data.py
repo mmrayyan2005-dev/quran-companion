@@ -56,3 +56,4 @@ class MemorizationProgress(Base):
     next_review_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="memorization_progress")
+    verse = relationship("Verse")

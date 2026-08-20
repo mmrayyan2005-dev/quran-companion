@@ -57,7 +57,15 @@ export default function Memorize() {
 
       {current && (
         <div className="card" style={{ cursor: 'default', textAlign: 'center', padding: '2rem 1.25rem' }}>
-          <span className="muted">Verse #{current.verse_id}</span>
+          <p className="muted" style={{ fontSize: '0.85rem' }}>
+            {current.verse.surah_name_english} · Ayah {current.verse.ayah_number}
+          </p>
+          <p style={{ fontSize: '1.6rem', lineHeight: 1.8, direction: 'rtl', margin: '0.75rem 0' }}>
+            {current.verse.text_arabic}
+          </p>
+          <p className="muted" style={{ fontSize: '0.95rem' }}>
+            {current.verse.text_translation_en}
+          </p>
           <p className="muted" style={{ marginTop: '1.5rem' }}>
             {revealed ? 'How well did you recall it?' : 'Recall this verse, then reveal.'}
           </p>
