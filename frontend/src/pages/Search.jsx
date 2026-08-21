@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { api } from '../api/client';
 
 export default function Search() {
@@ -45,6 +45,12 @@ export default function Search() {
 
       {loading && <p className="muted">Searching…</p>}
       {error && <p className="error-text">{error}</p>}
+
+      {results && results.length > 0 && (
+        <p className="muted" style={{ marginBottom: '1rem' }}>
+          {results.length} {results.length === 1 ? 'result' : 'results'}
+        </p>
+      )}
 
       {results && results.length === 0 && (
         <div className="empty-state">No verses found for "{q}". Try a different word.</div>

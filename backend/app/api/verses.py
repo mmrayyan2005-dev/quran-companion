@@ -1,5 +1,6 @@
+﻿import re
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -26,12 +27,6 @@ def get_surah_verses(surah_id: int, db: Session = Depends(get_db)):
 
 @router.get("/verses/{verse_id}/tafsir", response_model=list[TafsirOut])
 def get_verse_tafsir(verse_id: int, db: Session = Depends(get_db)):
-    """
-    Returns all available tafsir entries for a verse, from whichever
-    sources have been ingested so far (see scripts/ingest_tafsir_data.py).
-    Empty list is a valid response — it just means no tafsir source has
-    been ingested for this verse yet, not an error.
-    """
     verse = db.get(Verse, verse_id)
     if verse is None:
         raise HTTPException(status_code=404, detail="Verse not found")
@@ -41,20 +36,27 @@ def get_verse_tafsir(verse_id: int, db: Session = Depends(get_db)):
 @router.get("/verses/search", response_model=list[VerseSearchResult])
 def search_verses(
     q: str = Query(..., min_length=2, description="Search text (English translation)"),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(300, ge=1, le=1000),
     db: Session = Depends(get_db),
 ):
+    escaped = re.escape(q.strip())
+    pg_word_boundary_pattern = rf"\m{escaped}\M"
+    py_word_boundary_pattern = rf"\b{escaped}\b"
+
     matches = (
         db.query(Verse)
-        .filter(or_(Verse.text_translation_en.ilike(f"%{q}%")))
+        .filter(Verse.text_translation_en.op("~*")(pg_word_boundary_pattern))
+        .order_by(Verse.surah_id, Verse.ayah_number)
         .limit(limit)
         .all()
     )
     results = []
     for v in matches:
-        idx = v.text_translation_en.lower().find(q.lower())
+        match = re.search(py_word_boundary_pattern, v.text_translation_en, re.IGNORECASE)
+        idx = match.start() if match else 0
+        match_len = len(match.group()) if match else len(q)
         start = max(0, idx - 40)
-        snippet = v.text_translation_en[start: idx + len(q) + 40]
+        snippet = v.text_translation_en[start: idx + match_len + 40]
         results.append(
             VerseSearchResult(
                 verse=VerseOut.model_validate(v),
