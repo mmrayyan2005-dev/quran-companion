@@ -1,8 +1,9 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import TafsirPanel from './TafsirPanel';
+import AudioButton from '../components/AudioButton';
 
 export default function JuzDetail() {
   const { juzNumber } = useParams();
@@ -53,26 +54,29 @@ export default function JuzDetail() {
         <div key={item.verse.id} className="card" style={{ cursor: 'default' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem' }}>
             <span className="eyebrow">{item.surah_name_transliteration} · Ayah {item.verse.ayah_number}</span>
-            {isAuthenticated && (
-              <div style={{ display: 'flex', gap: '0.4rem' }}>
-                <button
-                  className="btn-secondary"
-                  style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
-                  onClick={() => handleAddToMemorization(item.verse.id)}
-                  disabled={memorizingVerseIds.has(item.verse.id)}
-                >
-                  {memorizingVerseIds.has(item.verse.id) ? 'Memorizing ✦' : '+ Memorize'}
-                </button>
-                <button
-                  className="btn-secondary"
-                  style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
-                  onClick={() => handleBookmark(item.verse.id)}
-                  disabled={savedVerseIds.has(item.verse.id)}
-                >
-                  {savedVerseIds.has(item.verse.id) ? 'Saved ✓' : 'Save'}
-                </button>
-              </div>
-            )}
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              <AudioButton surahId={item.verse.surah_id} ayahNumber={item.verse.ayah_number} />
+              {isAuthenticated && (
+                <>
+                  <button
+                    className="btn-secondary"
+                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+                    onClick={() => handleAddToMemorization(item.verse.id)}
+                    disabled={memorizingVerseIds.has(item.verse.id)}
+                  >
+                    {memorizingVerseIds.has(item.verse.id) ? 'Memorizing ✦' : '+ Memorize'}
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+                    onClick={() => handleBookmark(item.verse.id)}
+                    disabled={savedVerseIds.has(item.verse.id)}
+                  >
+                    {savedVerseIds.has(item.verse.id) ? 'Saved ✓' : 'Save'}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
           <p className="arabic-text">{item.verse.text_arabic}</p>
           <p>{item.verse.text_translation_en}</p>
