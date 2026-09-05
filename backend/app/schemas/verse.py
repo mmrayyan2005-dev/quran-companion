@@ -1,10 +1,4 @@
-"""
-Pydantic schemas for content endpoints. These validate shape AND values
-(e.g. ayah_number must be positive) at the API boundary — this is the
-"format-aware validation" the cricket project lacked, which is how
-impossible outlier stats slipped through undetected.
-"""
-from pydantic import BaseModel, ConfigDict, field_validator
+﻿from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class SurahOut(BaseModel):
@@ -66,3 +60,11 @@ class VerseSearchResult(BaseModel):
     verse: VerseOut
     surah_name_english: str
     match_snippet: str
+
+
+class JuzVerseOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    verse: VerseOut
+    surah_name_english: str
+    surah_name_transliteration: str

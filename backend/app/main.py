@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import verses, memorization, auth, bookmarks
+from app.api import verses, memorization, auth, bookmarks, hadith
 from app.db.config import settings
 
 app = FastAPI(
@@ -21,6 +21,7 @@ app.include_router(auth.router)
 app.include_router(verses.router)
 app.include_router(bookmarks.router)
 app.include_router(memorization.router)
+app.include_router(hadith.router)
 
 
 @app.get("/health")

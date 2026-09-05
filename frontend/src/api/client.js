@@ -2,9 +2,6 @@
  * Central fetch wrapper. Every request to the backend goes through here —
  * one place that knows the base URL, attaches the auth token, and turns
  * non-2xx responses into thrown errors with a readable message.
- *
- * This mirrors the backend's own principle (single source of truth,
- * no scattered ad-hoc logic) on the frontend side.
  */
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
@@ -60,8 +57,18 @@ export const api = {
   // Verses
   listSurahs: () => request('/api/v1/surahs'),
   getSurahVerses: (surahId) => request(`/api/v1/surahs/${surahId}/verses`),
+  getJuzVerses: (juzNumber) => request(`/api/v1/juz/${juzNumber}/verses`),
   searchVerses: (q) => request(`/api/v1/verses/search?q=${encodeURIComponent(q)}`),
   getVerseTafsir: (verseId) => request(`/api/v1/verses/${verseId}/tafsir`),
+
+  // Hadith
+  listHadithCollections: () => request('/api/v1/hadith/collections'),
+  listHadithBooks: (collectionKey) => request(`/api/v1/hadith/${collectionKey}/books`),
+  browseHadithBook: (collectionKey, bookNumber, page = 1) =>
+    request(`/api/v1/hadith/${collectionKey}/books/${bookNumber}?page=${page}&page_size=20`),
+  browseHadithCollection: (collectionKey, page = 1) =>
+    request(`/api/v1/hadith/${collectionKey}?page=${page}&page_size=20`),
+  searchHadiths: (q) => request(`/api/v1/hadith/search/all?q=${encodeURIComponent(q)}`),
 
   // Bookmarks
   listBookmarks: () => request('/api/v1/bookmarks', { auth: true }),

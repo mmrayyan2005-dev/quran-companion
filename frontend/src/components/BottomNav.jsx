@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 const items = [
   { to: '/', label: 'Read', icon: '📖' },
   { to: '/search', label: 'Search', icon: '🔍' },
+  { to: '/hadith', label: 'Hadith', icon: '📜' },
   { to: '/bookmarks', label: 'Saved', icon: '🔖' },
   { to: '/memorize', label: 'Memorize', icon: '✦' },
 ];

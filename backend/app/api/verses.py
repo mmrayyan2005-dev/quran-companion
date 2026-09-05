@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models.verse import Surah, Verse, Tafsir
-from app.schemas.verse import SurahOut, VerseOut, VerseSearchResult, TafsirOut
+from app.schemas.verse import SurahOut, VerseOut, VerseSearchResult, TafsirOut, JuzVerseOut
 
 router = APIRouter(prefix="/api/v1", tags=["verses"])
 
@@ -23,6 +23,30 @@ def get_surah_verses(surah_id: int, db: Session = Depends(get_db)):
     if not verses:
         raise HTTPException(status_code=404, detail="Surah not found")
     return verses
+
+
+@router.get("/juz/{juz_number}/verses", response_model=list[JuzVerseOut])
+def get_juz_verses(juz_number: int, db: Session = Depends(get_db)):
+    if not (1 <= juz_number <= 30):
+        raise HTTPException(status_code=400, detail="juz_number must be between 1 and 30")
+
+    verses = (
+        db.query(Verse)
+        .filter(Verse.juz_number == juz_number)
+        .order_by(Verse.surah_id, Verse.ayah_number)
+        .all()
+    )
+    if not verses:
+        raise HTTPException(status_code=404, detail="Juz not found")
+
+    return [
+        JuzVerseOut(
+            verse=VerseOut.model_validate(v),
+            surah_name_english=v.surah.name_english,
+            surah_name_transliteration=v.surah.name_transliteration,
+        )
+        for v in verses
+    ]
 
 
 @router.get("/verses/{verse_id}/tafsir", response_model=list[TafsirOut])
