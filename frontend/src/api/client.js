@@ -54,10 +54,38 @@ export const api = {
     return request('/api/v1/auth/login', { method: 'POST', body: form, form: true });
   },
 
-  // Verses
-  listSurahs: () => request('/api/v1/surahs'),
-  getSurahVerses: (surahId) => request(`/api/v1/surahs/${surahId}/verses`),
-  getJuzVerses: (juzNumber) => request(`/api/v1/juz/${juzNumber}/verses`),
+  // Verses — surah/juz results are cached in memory per session, since
+  // they never change during a visit and re-fetching on every Back/
+  // Forward navigation was the main cause of slow surah loading.
+  listSurahs: (() => {
+    let cache = null;
+    return async () => {
+      if (cache) return cache;
+      cache = await request('/api/v1/surahs');
+      return cache;
+    };
+  })(),
+
+  getSurahVerses: (() => {
+    const cache = new Map();
+    return async (surahId) => {
+      if (cache.has(surahId)) return cache.get(surahId);
+      const data = await request(`/api/v1/surahs/${surahId}/verses`);
+      cache.set(surahId, data);
+      return data;
+    };
+  })(),
+
+  getJuzVerses: (() => {
+    const cache = new Map();
+    return async (juzNumber) => {
+      if (cache.has(juzNumber)) return cache.get(juzNumber);
+      const data = await request(`/api/v1/juz/${juzNumber}/verses`);
+      cache.set(juzNumber, data);
+      return data;
+    };
+  })(),
+
   searchVerses: (q) => request(`/api/v1/verses/search?q=${encodeURIComponent(q)}`),
   getVerseTafsir: (verseId) => request(`/api/v1/verses/${verseId}/tafsir`),
 
