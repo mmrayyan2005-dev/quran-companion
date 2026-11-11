@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api/client';
+import ReadingModeBar from '../components/ReadingModeBar';
+import { useReading } from '../context/ReadingContext';
 
 export default function HadithBookDetail() {
   const { collectionKey, bookNumber } = useParams();
+  const { settings } = useReading();
+  const showArabic = settings.mode !== 'translation';
+  const showTranslation = settings.mode !== 'arabic';
   const [hadiths, setHadiths] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -25,6 +30,7 @@ export default function HadithBookDetail() {
     <div className="page">
       <Link to={`/hadith/${collectionKey}`} className="muted">&larr; All books</Link>
       <h1 style={{ marginTop: '0.75rem' }}>{bookName || `Book ${bookNumber}`}</h1>
+      <ReadingModeBar />
 
       {loading && <p className="muted">Loading…</p>}
       {error && <p className="error-text">{error}</p>}
@@ -39,8 +45,9 @@ export default function HadithBookDetail() {
             <span className="eyebrow">Hadith #{h.hadith_number}</span>
             {h.grade && <span className="muted" style={{ fontSize: '0.8rem' }}>{h.grade}</span>}
           </div>
-          {h.text_arabic && <p className="arabic-text" style={{ marginTop: '0.5rem' }}>{h.text_arabic}</p>}
-          <p>{h.text_english}</p>
+          {showArabic && h.text_arabic && <p className="arabic-text" style={{ marginTop: '0.5rem' }}>{h.text_arabic}</p>}
+          {/* If a hadith has no Arabic text, still show the translation so the card is never empty */}
+          {(showTranslation || !h.text_arabic) && <p>{h.text_english}</p>}
         </div>
       ))}
 
