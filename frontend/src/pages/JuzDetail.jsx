@@ -4,10 +4,15 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import TafsirPanel from './TafsirPanel';
 import AudioButton from '../components/AudioButton';
+import ReadingModeBar from '../components/ReadingModeBar';
+import { useReading } from '../context/ReadingContext';
 
 export default function JuzDetail() {
   const { juzNumber } = useParams();
   const { isAuthenticated } = useAuth();
+  const { settings } = useReading();
+  const showArabic = settings.mode !== 'translation';
+  const showTranslation = settings.mode !== 'arabic';
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +52,7 @@ export default function JuzDetail() {
     <div className="page">
       <Link to="/" className="muted">&larr; All Juz</Link>
       <h1 style={{ marginTop: '0.75rem' }}>Juz {juzNumber}</h1>
+      <ReadingModeBar />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 
@@ -78,8 +84,8 @@ export default function JuzDetail() {
               )}
             </div>
           </div>
-          <p className="arabic-text">{item.verse.text_arabic}</p>
-          <p>{item.verse.text_translation_en}</p>
+          {showArabic && <p className="arabic-text">{item.verse.text_arabic}</p>}
+          {showTranslation && <p>{item.verse.text_translation_en}</p>}
           <TafsirPanel verseId={item.verse.id} />
         </div>
       ))}

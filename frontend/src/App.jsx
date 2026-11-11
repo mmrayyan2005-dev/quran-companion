@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ReadingProvider } from './context/ReadingContext';
 import BottomNav from './components/BottomNav';
 import Home from './pages/Home';
 import SurahDetail from './pages/SurahDetail';
@@ -17,6 +18,7 @@ import Signup from './pages/Signup';
 export default function App() {
   return (
     <AuthProvider>
+      <ReadingProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -34,6 +36,7 @@ export default function App() {
         </Routes>
         <BottomNav />
       </BrowserRouter>
+      </ReadingProvider>
     </AuthProvider>
   );
 }

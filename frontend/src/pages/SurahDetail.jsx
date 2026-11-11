@@ -4,10 +4,15 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import TafsirPanel from './TafsirPanel';
 import AudioButton from '../components/AudioButton';
+import ReadingModeBar from '../components/ReadingModeBar';
+import { useReading } from '../context/ReadingContext';
 
 export default function SurahDetail() {
   const { surahId } = useParams();
   const { isAuthenticated } = useAuth();
+  const { settings } = useReading();
+  const showArabic = settings.mode !== 'translation';
+  const showTranslation = settings.mode !== 'arabic';
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,6 +51,7 @@ export default function SurahDetail() {
   return (
     <div className="page">
       <Link to="/" className="muted">&larr; All surahs</Link>
+      <ReadingModeBar />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 
@@ -77,8 +83,8 @@ export default function SurahDetail() {
               )}
             </div>
           </div>
-          <p className="arabic-text">{verse.text_arabic}</p>
-          <p>{verse.text_translation_en}</p>
+          {showArabic && <p className="arabic-text">{verse.text_arabic}</p>}
+          {showTranslation && <p>{verse.text_translation_en}</p>}
           <TafsirPanel verseId={verse.id} />
         </div>
       ))}
