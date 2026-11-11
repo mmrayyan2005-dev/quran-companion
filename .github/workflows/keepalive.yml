@@ -1,0 +1,13 @@
+name: Keep Supabase awake
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API
+        run: curl -fsS --max-time 120 --retry 3 --retry-delay 20 https://backend-b34e9ba5.fastapicloud.dev/api/v1/surahs -o /dev/null
