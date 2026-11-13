@@ -37,3 +37,10 @@ export function claimAudio(audio, onStop) {
     current.audio.pause();
     current.onStop();
   }
+  current = { audio, onStop };
+  applySpeed(audio);
+}
+
+export function releaseAudio(audio) {
+  if (current && current.audio === audio) current = null;
+}
