@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import TafsirPanel from './TafsirPanel';
@@ -8,9 +8,11 @@ import ReadingModeBar from '../components/ReadingModeBar';
 import VerseText from '../components/VerseText';
 import { UrduAyahButton, UrduPlayAll } from '../components/UrduAudio';
 import SpeedControl from '../components/SpeedControl';
+import { saveProgress } from '../readingProgress';
 
 export default function SurahDetail() {
   const { surahId } = useParams();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,31 @@ export default function SurahDetail() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [surahId]);
+
+  // Jump to the ayah in ?ayah=N once verses have loaded (used by "Continue reading").
+  useEffect(() => {
+    const target = searchParams.get('ayah');
+    if (!target || verses.length === 0) return;
+    const el = document.getElementById(`ayah-${target}`);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }, [verses, searchParams]);
+
+  // Remember the ayah near the top of the screen as the reader scrolls.
+  useEffect(() => {
+    if (verses.length === 0) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            saveProgress(entry.target.dataset.surah, Number(entry.target.dataset.ayah));
+          }
+        });
+      },
+      { rootMargin: '0px 0px -70% 0px' }
+    );
+    document.querySelectorAll('[data-ayah]').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [verses]);
 
   async function handleBookmark(verseId) {
     if (!isAuthenticated) return;
@@ -47,7 +74,7 @@ export default function SurahDetail() {
     }
   }
 
-    return (
+  return (
     <div className="page">
       <Link to="/" className="muted">&larr; All surahs</Link>
       <ReadingModeBar showLanguage />
@@ -59,7 +86,14 @@ export default function SurahDetail() {
       {error && <p className="error-text">{error}</p>}
 
       {verses.map((verse) => (
-        <div key={verse.id} className="card" style={{ cursor: 'default' }}>
+        <div
+          key={verse.id}
+          id={`ayah-${verse.ayah_number}`}
+          data-ayah={verse.ayah_number}
+          data-surah={verse.surah_id}
+          className="card"
+          style={{ cursor: 'default', scrollMarginTop: '1rem' }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
             <span className="eyebrow">Ayah {verse.ayah_number}</span>
             <div style={{ display: 'flex', gap: '0.4rem' }}>
