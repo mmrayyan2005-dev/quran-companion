@@ -5,14 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import TafsirPanel from './TafsirPanel';
 import AudioButton from '../components/AudioButton';
 import ReadingModeBar from '../components/ReadingModeBar';
-import { useReading } from '../context/ReadingContext';
+import VerseText from '../components/VerseText';
+import { UrduAyahButton, UrduPlayAll } from '../components/UrduAudio';
 
 export default function SurahDetail() {
   const { surahId } = useParams();
   const { isAuthenticated } = useAuth();
-  const { settings } = useReading();
-  const showArabic = settings.mode !== 'translation';
-  const showTranslation = settings.mode !== 'arabic';
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,7 +49,8 @@ export default function SurahDetail() {
   return (
     <div className="page">
       <Link to="/" className="muted">&larr; All surahs</Link>
-      <ReadingModeBar />
+      <ReadingModeBar showLanguage />
+      <UrduPlayAll ayahs={verses.map((v) => ({ surahId: v.surah_id, ayahNumber: v.ayah_number }))} label="Play Urdu translation (whole surah)" />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 
@@ -61,6 +60,7 @@ export default function SurahDetail() {
             <span className="eyebrow">Ayah {verse.ayah_number}</span>
             <div style={{ display: 'flex', gap: '0.4rem' }}>
               <AudioButton surahId={verse.surah_id} ayahNumber={verse.ayah_number} />
+              <UrduAyahButton surahId={verse.surah_id} ayahNumber={verse.ayah_number} />
               {isAuthenticated && (
                 <>
                   <button
@@ -83,8 +83,7 @@ export default function SurahDetail() {
               )}
             </div>
           </div>
-          {showArabic && <p className="arabic-text">{verse.text_arabic}</p>}
-          {showTranslation && <p>{verse.text_translation_en}</p>}
+          <VerseText verse={verse} />
           <TafsirPanel verseId={verse.id} />
         </div>
       ))}

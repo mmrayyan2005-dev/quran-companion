@@ -13,7 +13,7 @@
   Quranic manuscripts, without literally reproducing one.
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Spectral:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500&family=Spectral:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
 
 :root {
   /* Color */
@@ -256,6 +256,14 @@ input::placeholder {
   direction: rtl;
   text-align: right;
   color: var(--parchment);
+}
+
+.urdu-text {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Amiri', serif;
+  font-size: 1.25rem;
+  line-height: 2.5;
+  direction: rtl;
+  text-align: right;
 }
 
 @media (prefers-reduced-motion: reduce) {

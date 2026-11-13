@@ -6,6 +6,7 @@ const STORAGE_KEY = 'reading_settings';
 // are saved automatically, with no other plumbing needed.
 const DEFAULTS = {
   mode: 'both', // 'both' | 'arabic' | 'translation'
+  translation: 'en', // 'en' | 'ur' | 'both' (which translation to show)
 };
 
 function loadSettings() {

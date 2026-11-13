@@ -36,6 +36,7 @@ class Verse(Base):
     text_arabic = Column(Text, nullable=False)
     text_transliteration = Column(Text, nullable=True)
     text_translation_en = Column(Text, nullable=False)
+    text_translation_ur = Column(Text, nullable=True)  # Urdu: Fateh Muhammad Jalandhry (ur.jalandhry)
     juz_number = Column(Integer, nullable=False)
     page_number = Column(Integer, nullable=False)
 

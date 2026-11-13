@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { claimAudio } from './audioManager';
 
 // everyayah.com serves one MP3 per verse, named as 3-digit surah + 3-digit
 // ayah (e.g. 001001.mp3 = Surah 1, Ayah 1). No API or ingestion needed —
@@ -32,6 +33,7 @@ export default function AudioButton({ surahId, ayahNumber }) {
       audioRef.current.pause();
       setPlaying(false);
     } else {
+      claimAudio(audioRef.current, () => setPlaying(false));
       audioRef.current.play();
       setPlaying(true);
     }

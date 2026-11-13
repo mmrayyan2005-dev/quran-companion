@@ -36,6 +36,7 @@ class VerseOut(BaseModel):
     text_arabic: str
     text_transliteration: str | None
     text_translation_en: str
+    text_translation_ur: str | None = None
     juz_number: int
     page_number: int
 
