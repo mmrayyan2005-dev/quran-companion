@@ -46,11 +46,11 @@ export default function SurahDetail() {
     }
   }
 
-  return (
+    return (
     <div className="page">
       <Link to="/" className="muted">&larr; All surahs</Link>
       <ReadingModeBar showLanguage />
-      <UrduPlayAll ayahs={verses.map((v) => ({ surahId: v.surah_id, ayahNumber: v.ayah_number }))} label="Play Urdu translation (whole surah)" />
+      <UrduPlayAll verses={verses} label="Play Urdu translation (whole surah)" />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 

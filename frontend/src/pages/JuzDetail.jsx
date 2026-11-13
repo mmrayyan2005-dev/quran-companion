@@ -51,7 +51,7 @@ export default function JuzDetail() {
       <Link to="/" className="muted">&larr; All Juz</Link>
       <h1 style={{ marginTop: '0.75rem' }}>Juz {juzNumber}</h1>
       <ReadingModeBar showLanguage />
-      <UrduPlayAll ayahs={verses.map((item) => ({ surahId: item.verse.surah_id, ayahNumber: item.verse.ayah_number }))} label="Play Urdu translation (whole Juz)" />
+      <UrduPlayAll verses={verses.map((item) => item.verse)} label="Play Urdu translation (whole Juz)" />                                                        
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 
