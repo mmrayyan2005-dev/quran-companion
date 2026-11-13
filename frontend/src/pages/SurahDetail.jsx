@@ -51,6 +51,8 @@ export default function SurahDetail() {
       <Link to="/" className="muted">&larr; All surahs</Link>
       <ReadingModeBar showLanguage />
       <UrduPlayAll verses={verses} label="Play Urdu translation (whole surah)" />
+      <UrduPlayAll verses={verses} mode="arabic" showCredit={false} label="Play full surah (Arabic)" />
+      <UrduPlayAll verses={verses} mode="both" label="Arabic then Urdu, ayah by ayah" />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { claimAudio, releaseAudio } from './audioManager';
-
+import { getRecitationUrl } from './AudioButton';
 // Urdu voice: Shamshad Ali Khan reading Fateh Muhammad Jalandhry's translation.
 // EveryAyah serves one MP3 per ayah, named as 3-digit surah + 3-digit ayah, the
 // same pattern as the Arabic recitation in AudioButton. Nothing is hosted by us:
@@ -63,16 +63,22 @@ export function UrduAyahButton({ surahId, ayahNumber }) {
   );
 }
 
-// Plays every ayah in `verses` (objects with surah_id and ayah_number) in order, in Urdu.
-export function UrduPlayAll({ verses, label }) {
+//// Plays a playlist built from `verses` (objects with surah_id and ayah_number).
+// mode: 'urdu' = Urdu only, 'arabic' = Arabic only, 'both' = Arabic then Urdu for each ayah.
+export function UrduPlayAll({ verses, label, mode = 'urdu', showCredit = true }) {
   const audioRef = useRef(null);
   const indexRef = useRef(0);
   const listRef = useRef([]);
   const [playing, setPlaying] = useState(false);
-  const [position, setPosition] = useState(0); // 1-based ayah being played; 0 = not started
+  const [position, setPosition] = useState(0); // 1-based clip being played; 0 = not started
   const [error, setError] = useState(false);
 
-  const list = [...verses].sort((a, b) => a.surah_id - b.surah_id || a.ayah_number - b.ayah_number);
+  const sorted = [...verses].sort((a, b) => a.surah_id - b.surah_id || a.ayah_number - b.ayah_number);
+  const list = [];
+  sorted.forEach((v, i) => {
+    if (mode !== 'urdu') list.push({ url: getRecitationUrl(v.surah_id, v.ayah_number), n: i + 1 });
+    if (mode !== 'arabic') list.push({ url: getUrduAudioUrl(v.surah_id, v.ayah_number), n: i + 1 });
+  });
   listRef.current = list;
 
   useEffect(() => () => {
@@ -87,7 +93,7 @@ export function UrduPlayAll({ verses, label }) {
     const item = listRef.current[i];
     indexRef.current = i;
     setPosition(i + 1);
-    audio.src = getUrduAudioUrl(item.surah_id, item.ayah_number);
+    audio.src = item.url;
     audio.play().catch(() => {
       setError(true);
       setPlaying(false);
@@ -140,7 +146,9 @@ export function UrduPlayAll({ verses, label }) {
   }
 
   if (list.length === 0) return null;
-  if (error) return <p className="muted" style={{ fontSize: '0.85rem' }}>Urdu audio unavailable right now.</p>;
+  if (error) return <p className="muted" style={{ fontSize: '0.85rem' }}>Audio unavailable right now.</p>;
+
+  const current = position > 0 ? listRef.current[position - 1] : null;
 
   return (
     <div style={{ margin: '0.5rem 0 1rem' }}>
@@ -151,13 +159,17 @@ export function UrduPlayAll({ verses, label }) {
         {position > 0 && (
           <>
             <button className="btn-secondary" style={pillStyle} onClick={stop}>■ Stop</button>
-            <span className="muted" style={{ fontSize: '0.85rem' }}>Ayah {position} of {list.length}</span>
+            <span className="muted" style={{ fontSize: '0.85rem' }}>
+              Ayah {current ? current.n : 0} of {sorted.length}
+            </span>
           </>
         )}
       </div>
-      <p className="muted" style={{ fontSize: '0.75rem', marginTop: '0.4rem' }}>
-        Urdu voice: Shamshad Ali Khan, reading Fateh Muhammad Jalandhry's translation.
-      </p>
+      {showCredit && (
+        <p className="muted" style={{ fontSize: '0.75rem', marginTop: '0.4rem' }}>
+          Urdu voice: Shamshad Ali Khan, reading Fateh Muhammad Jalandhry's translation.
+        </p>
+      )}
     </div>
   );
 }
