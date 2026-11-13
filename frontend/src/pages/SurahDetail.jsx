@@ -7,6 +7,7 @@ import AudioButton from '../components/AudioButton';
 import ReadingModeBar from '../components/ReadingModeBar';
 import VerseText from '../components/VerseText';
 import { UrduAyahButton, UrduPlayAll } from '../components/UrduAudio';
+import SpeedControl from '../components/SpeedControl';
 
 export default function SurahDetail() {
   const { surahId } = useParams();
@@ -50,6 +51,7 @@ export default function SurahDetail() {
     <div className="page">
       <Link to="/" className="muted">&larr; All surahs</Link>
       <ReadingModeBar showLanguage />
+      <SpeedControl />
       <UrduPlayAll verses={verses} label="Play Urdu translation (whole surah)" />
       <UrduPlayAll verses={verses} mode="arabic" showCredit={false} label="Play full surah (Arabic)" />
       <UrduPlayAll verses={verses} mode="both" label="Arabic then Urdu, ayah by ayah" />
