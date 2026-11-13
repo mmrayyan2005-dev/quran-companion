@@ -2,6 +2,8 @@
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { getProgress } from '../readingProgress';
+import DailyAyah from '../components/DailyAyah';
+
 
 const JUZ_NUMBERS = Array.from({ length: 30 }, (_, i) => i + 1);
 
@@ -27,6 +29,7 @@ export default function Home() {
       <p className="eyebrow">Quran Study Companion</p>
       <h1>Read</h1>
       <p className="muted">Browse by Surah (chapter) or by Juz (Para) — whichever fits how you're reading.</p>
+      <DailyAyah /> 
 
       {progress && (
         <Link
