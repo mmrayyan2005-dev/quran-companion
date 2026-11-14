@@ -6,8 +6,8 @@ import TafsirPanel from './TafsirPanel';
 import AudioButton from '../components/AudioButton';
 import ReadingModeBar from '../components/ReadingModeBar';
 import VerseText from '../components/VerseText';
-import { UrduAyahButton, UrduPlayAll } from '../components/UrduAudio';
-import SpeedControl from '../components/SpeedControl';
+import { UrduAyahButton } from '../components/UrduAudio';
+import ListenBar from '../components/ListenBar';
 import { saveProgress } from '../readingProgress';
 
 export default function SurahDetail() {
@@ -78,10 +78,7 @@ export default function SurahDetail() {
     <div className="page">
       <Link to="/" className="muted">&larr; All surahs</Link>
       <ReadingModeBar showLanguage />
-      <SpeedControl />
-      <UrduPlayAll verses={verses} label="Play Urdu translation (whole surah)" />
-      <UrduPlayAll verses={verses} mode="arabic" showCredit={false} label="Play full surah (Arabic)" />
-      <UrduPlayAll verses={verses} mode="both" label="Arabic then Urdu, ayah by ayah" />
+      <ListenBar verses={verses} scope="surah" />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 
@@ -96,14 +93,14 @@ export default function SurahDetail() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
             <span className="eyebrow">Ayah {verse.ayah_number}</span>
-            <div style={{ display: 'flex', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
               <AudioButton surahId={verse.surah_id} ayahNumber={verse.ayah_number} />
               <UrduAyahButton surahId={verse.surah_id} ayahNumber={verse.ayah_number} />
               {isAuthenticated && (
                 <>
                   <button
                     className="btn-secondary"
-                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px', whiteSpace: 'nowrap' }}
                     onClick={() => handleAddToMemorization(verse.id)}
                     disabled={memorizingVerseIds.has(verse.id)}
                   >
@@ -111,7 +108,7 @@ export default function SurahDetail() {
                   </button>
                   <button
                     className="btn-secondary"
-                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px', whiteSpace: 'nowrap' }}
                     onClick={() => handleBookmark(verse.id)}
                     disabled={savedVerseIds.has(verse.id)}
                   >
