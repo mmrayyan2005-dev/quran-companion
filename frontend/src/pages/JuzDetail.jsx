@@ -6,8 +6,8 @@ import TafsirPanel from './TafsirPanel';
 import AudioButton from '../components/AudioButton';
 import ReadingModeBar from '../components/ReadingModeBar';
 import VerseText from '../components/VerseText';
-import { UrduAyahButton, UrduPlayAll } from '../components/UrduAudio';
-import SpeedControl from '../components/SpeedControl';
+import { UrduAyahButton } from '../components/UrduAudio';
+import ListenBar from '../components/ListenBar';
 
 export default function JuzDetail() {
   const { juzNumber } = useParams();
@@ -52,25 +52,22 @@ export default function JuzDetail() {
       <Link to="/" className="muted">&larr; All Juz</Link>
       <h1 style={{ marginTop: '0.75rem' }}>Juz {juzNumber}</h1>
       <ReadingModeBar showLanguage />
-      <SpeedControl />
-      <UrduPlayAll verses={verses.map((item) => item.verse)} label="Play Urdu translation (whole Juz)" />
-      <UrduPlayAll verses={verses.map((item) => item.verse)} mode="arabic" showCredit={false} label="Play full Juz (Arabic)" />
-      <UrduPlayAll verses={verses.map((item) => item.verse)} mode="both" label="Arabic then Urdu, ayah by ayah" />                                                        
+      <ListenBar verses={verses.map((item) => item.verse)} scope="Juz" />
       {loading && <p className="muted">Loading verses…</p>}
       {error && <p className="error-text">{error}</p>}
 
       {verses.map((item) => (
         <div key={item.verse.id} className="card" style={{ cursor: 'default' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
             <span className="eyebrow">{item.surah_name_transliteration} · Ayah {item.verse.ayah_number}</span>
-            <div style={{ display: 'flex', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
               <AudioButton surahId={item.verse.surah_id} ayahNumber={item.verse.ayah_number} />
               <UrduAyahButton surahId={item.verse.surah_id} ayahNumber={item.verse.ayah_number} />
               {isAuthenticated && (
                 <>
                   <button
                     className="btn-secondary"
-                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px', whiteSpace: 'nowrap' }}
                     onClick={() => handleAddToMemorization(item.verse.id)}
                     disabled={memorizingVerseIds.has(item.verse.id)}
                   >
@@ -78,7 +75,7 @@ export default function JuzDetail() {
                   </button>
                   <button
                     className="btn-secondary"
-                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+                    style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px', whiteSpace: 'nowrap' }}
                     onClick={() => handleBookmark(item.verse.id)}
                     disabled={savedVerseIds.has(item.verse.id)}
                   >
