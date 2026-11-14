@@ -87,6 +87,7 @@ export const api = {
   })(),
 
   searchVerses: (q) => request(`/api/v1/verses/search?q=${encodeURIComponent(q)}`),
+  askVerses: (q) => request(`/api/v1/verses/ask?q=${encodeURIComponent(q)}`),
   getVerseTafsir: (verseId) => request(`/api/v1/verses/${verseId}/tafsir`),
 
   // Hadith
