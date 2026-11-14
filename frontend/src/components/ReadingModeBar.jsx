@@ -13,7 +13,14 @@ const LANGS = [
 ];
 
 const rowStyle = { display: 'flex', gap: '0.5rem', flexWrap: 'wrap', margin: '0.75rem 0' };
-const btnStyle = { width: 'auto', padding: '0.4em 1em', fontSize: '0.85rem' };
+const selectStyle = {
+  width: 'auto',
+  flex: '1 1 10rem',
+  padding: '0.5em 0.8em',
+  fontSize: '0.9rem',
+  colorScheme: 'dark',
+  cursor: 'pointer',
+};
 
 // showLanguage: also show the English / Urdu choice. Only the Quran pages pass it,
 // because hadith data is English only.
@@ -21,32 +28,35 @@ export default function ReadingModeBar({ showLanguage = false }) {
   const { settings, updateSetting } = useReading();
 
   return (
-    <div>
-      <div style={rowStyle}>
+    <div style={rowStyle}>
+      <select
+        aria-label="What to show"
+        className="btn-secondary"
+        style={selectStyle}
+        value={settings.mode}
+        onChange={(e) => updateSetting('mode', e.target.value)}
+      >
         {MODES.map((opt) => (
-          <button
-            key={opt.value}
-            className={settings.mode === opt.value ? 'btn' : 'btn-secondary'}
-            style={btnStyle}
-            onClick={() => updateSetting('mode', opt.value)}
-          >
+          <option key={opt.value} value={opt.value}>
             {opt.label}
-          </button>
+          </option>
         ))}
-      </div>
+      </select>
+
       {showLanguage && settings.mode !== 'arabic' && (
-        <div style={rowStyle}>
+        <select
+          aria-label="Translation language"
+          className="btn-secondary"
+          style={selectStyle}
+          value={settings.translation}
+          onChange={(e) => updateSetting('translation', e.target.value)}
+        >
           {LANGS.map((opt) => (
-            <button
-              key={opt.value}
-              className={settings.translation === opt.value ? 'btn' : 'btn-secondary'}
-              style={btnStyle}
-              onClick={() => updateSetting('translation', opt.value)}
-            >
+            <option key={opt.value} value={opt.value}>
               {opt.label}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       )}
     </div>
   );
