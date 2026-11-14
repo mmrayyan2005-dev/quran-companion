@@ -15,7 +15,7 @@ export function getUrduAudioUrl(surahId, ayahNumber) {
   return `https://everyayah.com/data/${URDU_FOLDER}/${pad3(surahId)}${pad3(ayahNumber)}.mp3`;
 }
 
-const pillStyle = { width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' };
+const pillStyle = { width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px', whiteSpace: 'nowrap' };
 
 // Button for a single ayah.
 export function UrduAyahButton({ surahId, ayahNumber }) {

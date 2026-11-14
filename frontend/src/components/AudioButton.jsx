@@ -46,7 +46,7 @@ export default function AudioButton({ surahId, ayahNumber }) {
   return (
     <button
       className="btn-secondary"
-      style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px' }}
+      style={{ width: 'auto', padding: '0.3em 0.8em', fontSize: '0.8rem', borderRadius: '999px', whiteSpace: 'nowrap' }}
       onClick={toggle}
       title="Recitation by Mishary Rashid Alafasy"
     >
