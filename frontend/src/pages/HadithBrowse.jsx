@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { api } from '../api/client';
 
 export default function HadithBrowse() {
@@ -9,12 +9,21 @@ export default function HadithBrowse() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    setBooks(null);
+    setError(null);
+    setLoading(true);
     api
       .listHadithBooks(collectionKey)
       .then(setBooks)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [collectionKey]);
+
+  // Collections without books (like Qudsi) go straight to their hadiths.
+  // "replace" keeps the Back button working: it returns to the collections list.
+  if (books && books.length === 0) {
+    return <Navigate to={`/hadith/${collectionKey}/all`} replace />;
+  }
 
   return (
     <div className="page">
@@ -24,13 +33,6 @@ export default function HadithBrowse() {
 
       {loading && <p className="muted">Loading books…</p>}
       {error && <p className="error-text">{error}</p>}
-
-      {books && books.length === 0 && (
-        <div className="empty-state">
-          Topic categorization isn't available for this collection yet.{' '}
-          <Link to={`/hadith/${collectionKey}/all`}>Browse all hadiths instead &rarr;</Link>
-        </div>
-      )}
 
       {books && books.length > 0 && (
         <>
